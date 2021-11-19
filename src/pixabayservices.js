@@ -1,7 +1,4 @@
 import axios from "axios"
-//import { Notify } from 'notiflix/build/notiflix-notify-aio';
-//import LoadMoreBtn from './load-more-btn';
-
 
 export default class NewsApiService {
      constructor() {

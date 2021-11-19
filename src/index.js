@@ -1,11 +1,14 @@
 import API from './pixabayservices';
 import LoadMoreBtn from './load-more-btn';
-//import axios from 'axios';
 
+//Підключення бібліотек
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-//import 'notiflix/dist/notiflix-3.1.0.min.css';
-import './css/styles.css';
+import SimpleLightbox from 'simplelightbox';
 
+// Додатковий імпорт стилів
+
+import './css/styles.css';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const refs = {
     formRefs: document.querySelector('#search-form'),
@@ -71,6 +74,16 @@ async function fetchImagesOnScreen() {
          Notify.info("We're sorry, but you've reached the end of search results.", {timeout: 3000});//синя кнопка
   };
 
+       //Прокрутка сторінки
+  
+       const { height: cardHeight } = document.querySelector('.gallery')
+          .firstElementChild.getBoundingClientRect();
+
+        window.scrollBy({
+          top: cardHeight * 2,
+          behavior: 'smooth',
+});
+
 }
 
 //Обробка запиту і додавання зображень
@@ -90,12 +103,13 @@ async function fetch() {
 //Рендер розмітки однієї карточки
 
 function renderImagesList(images) {
-       // console.log(countries)
+        //console.log(images)
     const markup = images.map(
         ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => 
           
-            `<div class="photo-card">
-             <img class="photo-img" src="${webformatURL}" alt="${tags}" loading="lazy" width="200" height="200"/>
+            `<a class="gallery-item" href="${largeImageURL}">
+            <div class="photo-card">
+              <img class="photo-img" src="${webformatURL}" alt="${tags}" loading="lazy" width="200" height="200"/>
                <div class="info">
                   <p class="info-item">
                     <b class="info-text">Likes</b>${likes}
@@ -110,15 +124,24 @@ function renderImagesList(images) {
                     <b class="info-text">Downloads</b>${downloads}
                   </p>
               </div>
-            </div>`
+             </div>
+              </a>`
                       
         ).join('');
         
-         refs.galleryRefs.insertAdjacentHTML('beforeend', markup);
-      
+  refs.galleryRefs.insertAdjacentHTML('beforeend', markup);
+          
+     // Застосування бібліотеки SimpleLightbox
+  
+      let gallery = new SimpleLightbox('.gallery a', { captionsData:'alt', captionDelay:250});
+      gallery.refresh()
 }
 
+
+
+
 //Очистка розмітки 
+
 function clearMarkup() {
     refs.galleryRefs.innerHTML = '';
 }
