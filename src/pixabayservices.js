@@ -1,11 +1,7 @@
 import axios from "axios"
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import LoadMoreBtn from './load-more-btn';
+//import { Notify } from 'notiflix/build/notiflix-notify-aio';
+//import LoadMoreBtn from './load-more-btn';
 
-const loadMoreButton = new LoadMoreBtn({
-  selector: '[data-action="load-more"]',
-  hidden: true,
-})
 
 export default class NewsApiService {
      constructor() {
@@ -14,26 +10,16 @@ export default class NewsApiService {
           this.page = 1;
      };
 
-     fetchImages() {
+     async fetchImages() {
        //console.log(this)  
-     return axios.get(`https://pixabay.com/api/?key=24371516-b10d2b2a42c8e4a8969a3fdf2&q=${this.searchName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${this.perPage}&page=${this.page}`)
-            .then((response) => {
-                 console.log(response)
+     const fetchImages = await axios.get(`https://pixabay.com/api/?key=24371516-b10d2b2a42c8e4a8969a3fdf2&q=${this.searchName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${this.perPage}&page=${this.page}`)
+            
+     //console.log(fetchImages.data)
                
-                 if (response.data.hits.length === 0) {
-                   Notify.failure("Sorry, there are no images matching your search query. Please try again.")
-                     
-                 };
-
-                 if (response.data.totalHits <= this.perPage) {
-                       loadMoreButton.hide();
-                  Notify.info("We're sorry, but you've reached the end of search results.");
-                 };
-
-                 this.incrementPage();
+      this.incrementPage();
                  
-                 return response.data;
-        })
+      return fetchImages.data;
+        
      };
 
      incrementPage() {
@@ -42,7 +28,7 @@ export default class NewsApiService {
 
      resetPage() {
           this.page = 1;
-     };
+      };
 
      get query() {
           return this.searchName;

@@ -1,6 +1,6 @@
 import API from './pixabayservices';
 import LoadMoreBtn from './load-more-btn';
-import axios from 'axios';
+//import axios from 'axios';
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 //import 'notiflix/dist/notiflix-3.1.0.min.css';
@@ -23,11 +23,12 @@ const newsApi = new API();
 
 
 refs.formRefs.addEventListener('submit', handleSubmit);
-loadMoreButton.refs.button.addEventListener('click', fetchImages);
+loadMoreButton.refs.button.addEventListener('click', fetchImagesOnScreen);
 
 
+//Обробка запиту на кнопку Search
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
     event.preventDefault();
       clearMarkup();
     if (event.currentTarget.searchQuery.value.trim() === '') {
@@ -36,21 +37,54 @@ function handleSubmit(event) {
   loadMoreButton.show();
   loadMoreButton.disable();
   newsApi.query = event.currentTarget.searchQuery.value.trim();
+  
   newsApi.resetPage();
-  fetchImages();
-     
+   
+   const images = await fetch();
+
+       //console.log(images)
+       if (images.hits.length !== 0) {
+          Notify.success(`Hooray! We found ${images.totalHits} images.`, {timeout: 3000})//зелена кнопка
+    
+       } else {
+         loadMoreButton.hide();
+         Notify.failure("Sorry, there are no images matching your search query. Please try again.")//червона кнопка
+    };
+        
+       if (images.totalHits <= newsApi.perPage && images.hits.length !== 0) {
+         loadMoreButton.hide();
+         Notify.info("We're sorry, but you've reached the end of search results.", {timeout: 6000});//синя кнопка
+  };
+ 
  }
 
 
-function fetchImages() {
+ //Обробка запиту на кнопку Load more
+
+async function fetchImagesOnScreen() {
   loadMoreButton.disable();
-  newsApi.fetchImages().then(images => {
-    console.log(images)
-    renderImagesList(images.hits)
-    loadMoreButton.enable();
-    
-    
-  });
+  
+  const imagesOnClickButton = await fetch();
+      
+    if (imagesOnClickButton.hits.length < newsApi.perPage) {
+         loadMoreButton.hide();
+         Notify.info("We're sorry, but you've reached the end of search results.", {timeout: 3000});//синя кнопка
+  };
+
+}
+
+//Обробка запиту і додавання зображень
+
+async function fetch() {
+  try {
+  const images = await newsApi.fetchImages();
+     renderImagesList(images.hits)
+     loadMoreButton.enable();
+  return images
+  } catch (error) {
+    console.log(error.name);
+  }
+  
 }
 
 //Рендер розмітки однієї карточки
