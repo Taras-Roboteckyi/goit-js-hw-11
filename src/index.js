@@ -107,8 +107,8 @@ function renderImagesList(images) {
     const markup = images.map(
         ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => 
           
-            `<a class="gallery-item" href="${largeImageURL}">
-            <div class="photo-card">
+            `<div class="photo-card">
+            <a class="gallery-item" href="${largeImageURL}">
               <img class="photo-img" src="${webformatURL}" alt="${tags}" loading="lazy" width="200" height="200"/>
                <div class="info">
                   <p class="info-item">
@@ -124,8 +124,8 @@ function renderImagesList(images) {
                     <b class="info-text">Downloads</b>${downloads}
                   </p>
               </div>
-             </div>
-              </a>`
+              </a>
+             </div>`
                       
         ).join('');
         
